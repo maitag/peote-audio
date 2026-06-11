@@ -1,0 +1,12 @@
+{
+	"name": "peote-audio",
+	"url": "https://github.com/maitag/peote-audio",
+	"license": "MIT",
+	"tags": ["peote", "audio", "openAL", "webAudio"],
+	"description": "audio lib what wrapps around limes OpenAL-bindings and webAudio",
+	"version": "0.0.1",
+	"classPath": "src/",
+	"releasenote": "everytime magically again about doing something new",
+	"contributors": ["maitag"],
+	"dependencies": {}
+}
