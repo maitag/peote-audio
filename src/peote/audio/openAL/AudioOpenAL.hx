@@ -12,6 +12,8 @@ import lime.media.openal.ALContext;
 import lime.media.openal.ALC;
 import lime.media.openal.AL;
 
+import peote.audio.intern.InsertSortList;
+
 class AudioOpenAL
 {
 	public static inline var AL_FORMAT_MONO_FLOAT32 = 0x10010;
@@ -20,6 +22,9 @@ class AudioOpenAL
 
 	public static var context(default, null):ALContext = null;		
 	public static var sampleRate(default, null):Int = 44100;
+
+
+	public static var startTimeList = new InsertSortList<Float>();
 	
 	public static inline function init(defaultSampleRate:Int = 0)
 	{

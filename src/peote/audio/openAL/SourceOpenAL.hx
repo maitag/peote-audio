@@ -12,15 +12,22 @@ class SourceOpenAL
 	// little hack to prevent hashlinks garbage collector from deleting the source al-pointer too early
 	static var _sources = new haxe.ds.Vector<ALSource>(3);
 	static var _sourcesIndex:Int = 0;
+
 	public var source(default, set):ALSource;
+
 	inline function set_source(s:ALSource):ALSource {
 		_sources.set(_sourcesIndex++, s);
 		if (_sourcesIndex >= _sources.length) _sourcesIndex = 0;
 		return source = s;
 	}
 	#else
+
 	public var source(default, null):ALSource;
+
 	#end
+
+
+
 
 	public function new(audioBuffer:BufferOpenAL)
 	{
@@ -46,6 +53,8 @@ class SourceOpenAL
 		// trace(source);
 	}
 
+
+	
 	public function play()
 	{
 		AL.getError();
