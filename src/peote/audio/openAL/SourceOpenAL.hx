@@ -51,7 +51,7 @@ class SourceOpenAL
 
 	function playALSource() {
 		trace("get a new ALSource and play it");
-		source = AudioOpenAL.getALSource(this);
+		source = AudioOpenAL.getALSourceFromPool(this);
 
 		AL.getError();
 		AL.sourcef  (source, AL.PITCH, 1.0);
@@ -74,9 +74,7 @@ class SourceOpenAL
 
 	function stopALSource() {
 		trace("stop and free the ALSource");
-
-
-		AudioOpenAL.freeALSource(this);
+		AudioOpenAL.freeALSourceFromPool(this);
 	}
 	
 

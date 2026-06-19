@@ -62,7 +62,7 @@ class AudioOpenAL
 	
 	// ----------- POOLING ------------------
 
-	public static inline function getALSource(source:SourceOpenAL):ALSource
+	public static inline function getALSourceFromPool(source:SourceOpenAL):ALSource
 	{
 		if (alSrcPoolIndex == alSrcPoolMax) // Pool is full
 		{
@@ -76,7 +76,6 @@ class AudioOpenAL
 			// prevent freeing the source if it is already removed from the Pool
 			// TODO: check that this works correctly if pool is full
 			timeEndList.remove( srcPool.shift() );
-
 			srcPool.push(source);
 			
 			return freeSrc;
@@ -87,7 +86,7 @@ class AudioOpenAL
 		}
 	}
 
-	public static inline function freeALSource(source:SourceOpenAL)
+	public static inline function freeALSourceFromPool(source:SourceOpenAL)
 	{
 		AL.sourceStop(source.source);
 		AL.sourcei(source.source, AL.BUFFER, null); // unassign buffer
