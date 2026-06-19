@@ -27,11 +27,10 @@ class AudioOpenAL
 	public static var context(default, null):ALContext = null;		
 	public static var sampleRate(default, null):Int = 44100;
 
-
-	public static var srcPool = new Array<ALSource>();
-	public static var srcPoolMax:Int = 32;  // maximum what can play parallele
-	public static var srcPoolIndex:Int = 0; 
-
+	public static var srcPool = new Array<SourceOpenAL>();
+	public static var alSrcPool = new Array<ALSource>();
+	public static var alSrcPoolMax:Int = 32;  // maximum what can play parallele
+	public static var alSrcPoolIndex:Int = 0;
 
 	public static var timeStartList = new TimeStartList();
 	public static var timeEndList = new TimeEndList();
@@ -53,9 +52,9 @@ class AudioOpenAL
 		if (AL.getError() != AL.NO_ERROR) trace("AL ERROR: init");
 		
 		// fill the pool by empty AL-Sources
-		for (i in 0...srcPoolMax) {
+		for (i in 0...alSrcPoolMax) {
 			AL.getError();
-			srcPool.push(AL.createSource());
+			alSrcPool.push(AL.createSource());
 			if (AL.getError() != AL.NO_ERROR) trace("AL ERROR: source create");				
 		}
 	}
@@ -63,30 +62,41 @@ class AudioOpenAL
 	
 	// ----------- POOLING ------------------
 
-	public static inline function getALSource():ALSource {
-		if (srcPoolIndex == srcPoolMax) // Pool is full
+	public static inline function getALSource(source:SourceOpenAL):ALSource
+	{
+		if (alSrcPoolIndex == alSrcPoolMax) // Pool is full
 		{
-			var freeSrc = srcPool.shift();
+			var freeSrc = alSrcPool.shift();
+			alSrcPool.push(freeSrc);
 
 			AL.sourceStop(freeSrc);
 			AL.sourcei(freeSrc, AL.BUFFER, null); // unassign buffer
 
-			// TODO: prevent freeing the source if it is already removed from the Pool
+			// srcPool.shift();
+			// prevent freeing the source if it is already removed from the Pool
+			// TODO: check that this works correctly if pool is full
+			timeEndList.remove( srcPool.shift() );
 
-			srcPool.push(freeSrc);
+			srcPool.push(source);
+			
 			return freeSrc;
 		}
-		else return srcPool[srcPoolIndex++];
+		else {
+			srcPool.push(source);
+			return alSrcPool[alSrcPoolIndex++];
+		}
 	}
 
-	public static inline function freeALSource(alSource:ALSource) {
-		srcPool.remove(alSource);
+	public static inline function freeALSource(source:SourceOpenAL)
+	{
+		AL.sourceStop(source.source);
+		AL.sourcei(source.source, AL.BUFFER, null); // unassign buffer
 
-		AL.sourceStop(alSource);
-		AL.sourcei(alSource, AL.BUFFER, null); // unassign buffer
+		alSrcPool.remove(source.source);
+		alSrcPool.push(source.source);
+		alSrcPoolIndex--;
 
-		srcPool.push(alSource);
-		srcPoolIndex--;
+		srcPool.remove(source);
 	}
 
 

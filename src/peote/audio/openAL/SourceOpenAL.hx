@@ -9,6 +9,7 @@ import lime.media.openal.*;
 @:allow(peote.audio.openAL)
 class SourceOpenAL
 {
+	/*
 	#if hl
 	// little hack to prevent hashlinks garbage collector from deleting the source al-pointer too early
 	static var _sources = new haxe.ds.Vector<ALSource>(3);
@@ -22,13 +23,12 @@ class SourceOpenAL
 		return source = s;
 	}
 	#else
-
+	*/
 	public var source(default, null):ALSource;
 
-	#end
+	// #end
 
 	public var buffer:BufferOpenAL;
-
 
 	public var timeStart:Float;
 	public var timeEnd:Float;
@@ -39,7 +39,6 @@ class SourceOpenAL
 
 		// TODO: only calculate duration etc.
 
-
 		buffer = audioBuffer;
 
 		/*
@@ -47,30 +46,12 @@ class SourceOpenAL
 		AL.getError();
 		source = AL.createSource();
 		if (AL.getError() != AL.NO_ERROR) trace("AL ERROR: source create");
-		
-		
-		// source = AL.genSources(1)[0];
-
-		AL.getError();
-		AL.sourcef  (source, AL.PITCH, 1.0);
-		AL.sourcef  (source, AL.GAIN, 1.0);
-		AL.source3f (source, AL.POSITION, 0.0, 0.0, 0.0); // for first value: -1.0 -> left, 1.0 -> right
-		AL.source3f (source, AL.VELOCITY, 0.0, 0.0, 0.0);
-		// AL.sourcei(source, AL.SOURCE_TYPE, AL.STATIC);
-		// AL.sourcei(source, AL.SOURCE_TYPE, AL.STREAMING);
-		if (AL.getError() != AL.NO_ERROR) trace("AL ERROR: source set properties");
-		
-		AL.getError();
-		AL.sourcei(source, AL.BUFFER, buffer.buffer);
-		if (AL.getError() != AL.NO_ERROR) trace("AL ERROR: source bind to buffer");
-
-		// trace(source);
 		*/
 	}
 
 	function playALSource() {
 		trace("get a new ALSource and play it");
-		source = AudioOpenAL.getALSource();
+		source = AudioOpenAL.getALSource(this);
 
 		AL.getError();
 		AL.sourcef  (source, AL.PITCH, 1.0);
@@ -93,14 +74,9 @@ class SourceOpenAL
 
 	function stopALSource() {
 		trace("stop and free the ALSource");
-		// TODO: check that this prevents double removing (if Pool is full)
-		// if the source is already re-used
-		if (AL.getSourcei(source, AL.BUFFER) == null) {
-			trace("ALREADY FREE");
-			return;
-		}
 
-		AudioOpenAL.freeALSource(source);
+
+		AudioOpenAL.freeALSource(this);
 	}
 	
 
