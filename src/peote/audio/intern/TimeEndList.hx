@@ -1,6 +1,6 @@
 package peote.audio.intern;
 
-@:forward @:forward.new
+@:forward @:forward.new @:arrayAccess
 abstract TimeEndList(Array<AudioSource>) //from Array<AudioSource> to Array<AudioSource>
 {	
 	// insert a audioSource at index where it keeps the list sorted, returns these index
@@ -14,7 +14,7 @@ abstract TimeEndList(Array<AudioSource>) //from Array<AudioSource> to Array<Audi
     
 		// ------ only ONE element into list ------
 		if (this.length == 1) {
-			if (this[0].timeEnd < audioSource.timeEnd) {
+			if (audioSource.timeEnd < this[0].timeEnd) {
 				this.insert(0, audioSource);
 				return (0);
 			}
@@ -30,8 +30,8 @@ abstract TimeEndList(Array<AudioSource>) //from Array<AudioSource> to Array<Audi
 		var i:Int = from + ((to-from) >> 1);
 
 		while (from+1 < to) { 
-			if (this[i].timeEnd < audioSource.timeEnd) {
-				if (this[i-1].timeEnd >= audioSource.timeEnd) {
+			if (audioSource.timeEnd < this[i].timeEnd) {
+				if (audioSource.timeEnd >= this[i-1].timeEnd) {
 					this.insert(i, audioSource);
 					return(i);
 				}

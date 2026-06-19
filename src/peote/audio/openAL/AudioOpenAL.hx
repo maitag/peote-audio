@@ -4,6 +4,7 @@ package peote.audio.openAL;
 // ------------------- OpenAL ---------------------
 // ------------------------------------------------
 
+import haxe.Timer;
 import haxe.io.Bytes;
 import haxe.io.Float32Array;
 
@@ -16,6 +17,7 @@ import lime.media.openal.ALSource;
 import peote.audio.intern.TimeStartList;
 import peote.audio.intern.TimeEndList;
 
+@:allow(peote.audio.openAL)
 class AudioOpenAL
 {
 	public static inline var AL_FORMAT_MONO_FLOAT32 = 0x10010;
@@ -26,8 +28,14 @@ class AudioOpenAL
 	public static var sampleRate(default, null):Int = 44100;
 
 
-	public static var timeStarList = new TimeStartList();
+	public static var srcPool = new Array<ALSource>();
+	public static var srcPoolMax:Int = 32;  // maximum what can play parallele
+	public static var srcPoolIndex:Int = 0; 
+
+
+	public static var timeStartList = new TimeStartList();
 	public static var timeEndList = new TimeEndList();
+	public static var time:Float = 0.0;
 
 	
 	public static inline function init(defaultSampleRate:Int = 0)
@@ -44,11 +52,84 @@ class AudioOpenAL
 
 		if (AL.getError() != AL.NO_ERROR) trace("AL ERROR: init");
 		
+		// fill the pool by empty AL-Sources
+		for (i in 0...srcPoolMax) {
+			AL.getError();
+			srcPool.push(AL.createSource());
+			if (AL.getError() != AL.NO_ERROR) trace("AL ERROR: source create");				
+		}
 	}
 
-	public static inline function update() {
-		// handle timeStarList and timeEndList
-	};
+	
+	// ----------- POOLING ------------------
+
+	public static inline function getALSource():ALSource {
+		if (srcPoolIndex == srcPoolMax) // Pool is full
+		{
+			var freeSrc = srcPool.shift();
+
+			AL.sourceStop(freeSrc);
+			AL.sourcei(freeSrc, AL.BUFFER, null); // unassign buffer
+
+			// TODO: prevent freeing the source if it is already removed from the Pool
+
+			srcPool.push(freeSrc);
+			return freeSrc;
+		}
+		else return srcPool[srcPoolIndex++];
+	}
+
+	public static inline function freeALSource(alSource:ALSource) {
+		srcPool.remove(alSource);
+
+		AL.sourceStop(alSource);
+		AL.sourcei(alSource, AL.BUFFER, null); // unassign buffer
+
+		srcPool.push(alSource);
+		srcPoolIndex--;
+	}
+
+
+	// --------- UPDATE -----------
+	
+	static var _audioSource:AudioSource;
+	public static inline function update(?currentTime:Float)
+	{
+		time = (currentTime != null) ? currentTime : Timer.stamp();
+		// trace("update",time);
+		
+		// check what have to start playing next:
+		while (timeStartList.length != 0)
+		{
+			_audioSource = timeStartList[0];
+			if (_audioSource.timeStart > time) break;			
+			_audioSource.playALSource();
+			timeStartList.shift();
+		}
+
+		// check what have to stop playing next:
+		while (timeEndList.length != 0)
+		{	
+			_audioSource = timeEndList[0];
+			if (_audioSource.timeEnd > time) break;
+			_audioSource.stopALSource();
+			timeEndList.shift();
+		}
+	}
+
+	static inline function addToTimeStartList(audioSource:SourceOpenAL) {
+		timeStartList.insertSort(audioSource);
+		// var t="timeStartList: ["; for (s in timeStartList) t+=s.timeStart+","; t+="]";trace(t);
+	}
+
+	static inline function addToTimeEndList(audioSource:SourceOpenAL) {
+		timeEndList.insertSort(audioSource);
+		// var t="timeEndList: ["; for (s in timeEndList) t+=s.timeEnd+","; t+="]";trace(t);
+	}
+
+	// TODO:
+	// delete and free all sources from the pool
+	// ...AL.deleteSource(source);
 
 	
 	/*
