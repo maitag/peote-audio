@@ -27,6 +27,8 @@ class SourceOpenAL
 	#end
 
 
+	public var timeStart:Float;
+	public var timeEnd:Float;
 
 
 	public function new(audioBuffer:BufferOpenAL)

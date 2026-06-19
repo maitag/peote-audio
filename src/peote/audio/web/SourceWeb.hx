@@ -6,9 +6,15 @@ package peote.audio.web;
 
 import js.html.audio.AudioBufferSourceNode;
 
+
 class SourceWeb
 {
 	public var source(default, null):AudioBufferSourceNode;
+
+	
+	public var timeStart:Float;
+	public var timeEnd:Float;
+
 
 	public function new(audioBuffer:BufferWeb)
 	{

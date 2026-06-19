@@ -13,7 +13,8 @@ import lime.media.openal.ALC;
 import lime.media.openal.AL;
 import lime.media.openal.ALSource;
 
-import peote.audio.intern.SourceTimesList;
+import peote.audio.intern.TimeStartList;
+import peote.audio.intern.TimeEndList;
 
 class AudioOpenAL
 {
@@ -25,8 +26,9 @@ class AudioOpenAL
 	public static var sampleRate(default, null):Int = 44100;
 
 
-	public static var startTimeSources = new SourceTimesList<ALSource>();
-	public static var endTimeSources = new SourceTimesList<ALSource>();
+	public static var timeStarList = new TimeStartList();
+	public static var timeEndList = new TimeEndList();
+
 	
 	public static inline function init(defaultSampleRate:Int = 0)
 	{
@@ -45,7 +47,7 @@ class AudioOpenAL
 	}
 
 	public static inline function update() {
-		// handle startTimeSources and endTimeSources
+		// handle timeStarList and timeEndList
 	};
 
 	
