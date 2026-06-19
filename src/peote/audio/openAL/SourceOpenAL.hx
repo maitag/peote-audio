@@ -55,13 +55,34 @@ class SourceOpenAL
 
 
 	
-	public function play()
+	public function _play()
 	{
 		AL.getError();
 		AL.sourcePlay(source);	
 		if (AL.getError() != AL.NO_ERROR) trace("AL ERROR: source play");
 	}
-	
+
+	public function play(?duration:Float, repeat:Int = 0, ?onEndOfPlay:AudioSource->Void) {
+		// TODO: Timescheduler
+		// insert-sort source-IDs into a array for what is still playing and at what time it had to stop
+		_play();
+	}
+
+	public function playDelay(delay:Float, ?duration:Float, repeat:Int = 0, ?onEndOfPlay:AudioSource->Void) {
+		// TODO: Timescheduler
+
+		// ...call playFromTo(...)
+	}
+	public function playFromTo(startTime:Float, endTime:Float, repeat:Int = 0, ?onEndOfPlay:AudioSource->Void) {
+		// insert-sort source-IDs into a array for what will start playing into future (and at what time)
+		// insert-sort source-IDs into a array for what is still playing and at what time it had to stop
+	}
+
+	public function stop() {
+	}
+
+	public function stopAt(endTime) {
+	}	
 	// TODO: clean up source after playing
 	// if (source!=null) AL.deleteSource(source);
 }
