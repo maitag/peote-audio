@@ -1,9 +1,11 @@
 package peote.audio.intern;
 
-@:forward @:forward.new @:arrayAccess
+// @:forward.new
+@:forward @:arrayAccess
 abstract TimeEndList(Array<AudioSource>) //from Array<AudioSource> to Array<AudioSource>
 {	
-	// insert a audioSource at index where it keeps the list sorted, returns these index
+	public function new() this = new Array<AudioSource>();
+
 	public function insertSort(audioSource:AudioSource):Int {
 		
 		// ------ if list is empty --------- 
